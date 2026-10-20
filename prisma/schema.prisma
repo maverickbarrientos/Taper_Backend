@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PhaseType {
+  GENERAL
+  SPECIFIC
+  TAPER
+}
+
+enum PhaseStatus {
+  ONGOING
+  COMPLETED
+  SKIPPED
+}
+
+enum ProgramStatus {
+  UPCOMING
+  COMPLETED
+  ONGOING
+  CANCELLED
+  SKIPPED
+}
+
+enum UserRole {
+  ATHLETE 
+  COACH
+}
+
+model User {
+  id                    String      @id
+  firstName             String      @map("first_name")
+  lastName              String      @map("last_name")
+  email                 String
+  role                  UserRole
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt      @map("updated_at")
+
+  program               Program[]
+
+  @@map("user")
+}
+
+model Program {
+  id                    String      @id @default(uuid())
+  athleteId             String      @map("athlete_id")
+  name                  String
+  date                  DateTime
+  status                ProgramStatus 
+  startDate             DateTime    @map("start_date")
+  endDate               DateTime    @map("end_date")
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt      @map("updated_at")
+
+  athlete               User        @relation(fields: [athleteId], references: [id]) 
+
+  phase                 Phase[]
+
+  @@map("program")
+}
+
+model Phase {
+  id                    String      @id @default(uuid())
+  programId             String      @map("program_id")
+  name                  String      
+  phaseType             PhaseType   @map("phase_type")
+  startDate             DateTime    @map("start_date")
+  endDate               DateTime    @map("end_date")
+  status                PhaseStatus
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt      @map("updated_at")
+
+  program               Program     @relation(fields: [programId], references: [id])
+  
+  session               Session[]
+
+  @@map("phase")
+}
+
+model Session {
+  id                    String      @id @default(uuid())
+  phaseId               String      @map("phase_id")
+  title                 String
+  date                  DateTime
+  notes                 String?
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt      @map("updated_at")
+
+  phase                 Phase       @relation(fields: [phaseId], references: [id])
+
+  exercise              Exercise[]
+
+  @@map("session")
+}
+
+model Exercise {
+  id                    String      @id @default(uuid())
+  sessionId             String      @map("session_id")
+  name                  String
+  sets                  String
+  reps                  String
+  notes                 String
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt      @map("updated_at")
+
+  session               Session     @relation(fields: [sessionId], references: [id])
+
+  athleteLogs           AthleteLogs[]
+
+  @@map("exercise")
+}
+
+model AthleteLogs {
+  id                    String      @id @default(uuid())
+  exerciseId            String    
+  actualSets            String      @map("actual_sets")
+  actualReps            String      @map("actual_reps")
+  loggedAt              DateTime    @default(now()) @map("logged_at")
+  updatedAt             DateTime    @updatedAt      @map("created_at")
+
+  exercise              Exercise    @relation(fields: [exerciseId], references: [id])
+
+  @@map("athlete_logs")
+}
