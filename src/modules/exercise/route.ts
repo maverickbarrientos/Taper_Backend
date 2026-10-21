@@ -9,5 +9,6 @@ const service = new ExerciseService(prisma)
 const controller = new ExerciseController(service)
 
 router.post('/create', controller.addExerciseToSession.bind(controller))
+router.post('/log', controller.logExercise.bind(controller))
 
 export default router

@@ -8,8 +8,21 @@ export class ProgramService {
 
   constructor (private db: PrismaClient) {}
 
+  async getAllPrograms() {
+    return await this.db.program.findMany({
+      include: { athlete: true }
+    });
+  }
+
   async getAthleteProgram (where: ProgramWhereInput) {
-    return await this.db.program.findFirst({ where });
+    return await this.db.program.findFirst(
+      { 
+        where,
+        include: {
+          athlete: true,
+        }
+      }
+    );
   }
 
   async createProgram (data: CreateProgram) {

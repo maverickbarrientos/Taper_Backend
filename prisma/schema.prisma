@@ -46,6 +46,8 @@ model User {
   createdAt             DateTime    @default(now()) @map("created_at")
   updatedAt             DateTime    @updatedAt      @map("updated_at")
 
+  athleteLogs           AthleteLogs[] @relation("Athlete")
+  logAuthor             AthleteLogs[] @relation("LogAuthor")
   program               Program[]
 
   @@map("user")
@@ -122,12 +124,17 @@ model Exercise {
 
 model AthleteLogs {
   id                    String      @id @default(uuid())
+  athleteId             String
   exerciseId            String    
   actualSets            String      @map("actual_sets")
   actualReps            String      @map("actual_reps")
+  notes                 String
+  loggedBy              String
   loggedAt              DateTime    @default(now()) @map("logged_at")
-  updatedAt             DateTime    @updatedAt      @map("created_at")
+  updatedAt             DateTime    @updatedAt      @map("updated_at")
 
+  user                  User        @relation("LogAuthor", fields: [loggedBy], references: [id])
+  athlete               User        @relation("Athlete", fields: [athleteId], references: [id])
   exercise              Exercise    @relation(fields: [exerciseId], references: [id])
 
   @@map("athlete_logs")

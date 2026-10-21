@@ -11,4 +11,9 @@ export class ExerciseController {
     const exercise = await this.service.addExerciseToSession(req.body);
     return APIResponses.created(res, exercise);
   }
+
+  async logExercise(req: Request, res: Response) {
+    const log = await this.service.logExercise(req.body);
+    return APIResponses.created(res, log);
+  }
 }
