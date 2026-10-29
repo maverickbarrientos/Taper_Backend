@@ -19,6 +19,7 @@ enum PhaseType {
 }
 
 enum PhaseStatus {
+  UPCOMING
   ONGOING
   COMPLETED
   SKIPPED
@@ -37,12 +38,21 @@ enum UserRole {
   COACH
 }
 
+enum ExerciseStatus {
+  PENDING
+  LOGGED
+  MISSED
+}
+
 model User {
   id                    String      @id
   firstName             String      @map("first_name")
   lastName              String      @map("last_name")
   email                 String
   role                  UserRole
+  events                String[]    @default([])
+  goals                 String[]    @default([])
+  deletedAt             DateTime?   @map("deleted_at")
   createdAt             DateTime    @default(now()) @map("created_at")
   updatedAt             DateTime    @updatedAt      @map("updated_at")
 
@@ -67,6 +77,7 @@ model Program {
   athlete               User        @relation(fields: [athleteId], references: [id]) 
 
   phase                 Phase[]
+  aiSummary             AISummary[]
 
   @@map("program")
 }
@@ -111,7 +122,9 @@ model Exercise {
   name                  String
   sets                  String
   reps                  String
+  order                 Int
   notes                 String
+  status                ExerciseStatus @default(PENDING)
   createdAt             DateTime    @default(now()) @map("created_at")
   updatedAt             DateTime    @updatedAt      @map("updated_at")
 
@@ -126,8 +139,7 @@ model AthleteLogs {
   id                    String      @id @default(uuid())
   athleteId             String
   exerciseId            String    
-  actualSets            String      @map("actual_sets")
-  actualReps            String      @map("actual_reps")
+  log                   Json[]
   notes                 String
   loggedBy              String
   loggedAt              DateTime    @default(now()) @map("logged_at")
@@ -138,4 +150,17 @@ model AthleteLogs {
   exercise              Exercise    @relation(fields: [exerciseId], references: [id])
 
   @@map("athlete_logs")
+}
+
+model AISummary {
+  id                    String      @id @default(uuid())
+  programId             String      @map("program_id")
+  weekStart             DateTime    @map("week_start")
+  content               String
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt @map("updated_at")
+
+  program               Program     @relation(fields: [programId], references: [id])
+
+  @@map("ai_summary")
 }
