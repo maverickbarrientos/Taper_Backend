@@ -1,6 +1,6 @@
 
 import express, { Express, Request, Response } from "express";
-import cors from "cors"
+import cors from "cors";
 import userRouter from "./modules/user/route";
 import programRouter from "./modules/program/route";
 import sessionRouter from "./modules/session/route";
@@ -13,7 +13,7 @@ const app: Express = express()
 
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", process.env.FRONTEND_URL!],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
