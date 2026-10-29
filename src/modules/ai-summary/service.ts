@@ -49,10 +49,13 @@ export class AISummaryService {
 
     const sessions = program.phase.flatMap(p => p.session);
 
-    const content = await this.llm.generateText(
-      WEEKLY_SUMMARY_SYSTEM,
-      buildWeeklyPrompt(program, sessions, weekStart, weekEnd),
-    );
+    // Nothing planned: skip the LLM, which would otherwise invent a week from the header alone
+    const content = sessions.length === 0
+      ? "No sessions were planned for this week, so there is nothing to summarize."
+      : await this.llm.generateText(
+          WEEKLY_SUMMARY_SYSTEM,
+          buildWeeklyPrompt(program, sessions, weekStart, weekEnd),
+        );
 
     if (existing) {
       return this.db.aISummary.update({ where: { id: existing.id }, data: { content } });

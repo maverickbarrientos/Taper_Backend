@@ -15,7 +15,8 @@ Rules:
 - Compare logged reps to planned reps and mention meaningful differences.
 - Mention how many days remain until competition only if it affects the suggestion.
 - The coach makes the final call, so phrase suggestions as options, not orders.
-- Do not invent data that isn't provided. If something is missing, say so.`;
+- Do not invent data that isn't provided. If something is missing, say so.
+- If the data says no exercises were logged this week, state only that, list the planned sessions, and do not describe performance, fatigue, or progress. Make no training suggestion beyond asking the athlete to log their sessions.`;
 
 const dayFmt = (d: Date) =>
   d.toLocaleDateString("en-PH", {
@@ -61,5 +62,7 @@ export function buildWeeklyPrompt(
   weekStart: Date,
   weekEnd: Date,
 ): string {
-  return `${buildHeader(program, weekStart, weekEnd)}\n\n${buildWeekText(sessions)}`;
+  const anyLogged = sessions.some((s) => s.exercise.some((e) => e.athleteLogs.length > 0));
+  const logNote = anyLogged ? "" : "\n\nNo exercises were logged by the athlete this week.";
+  return `${buildHeader(program, weekStart, weekEnd)}\n\n${buildWeekText(sessions)}${logNote}`;
 }
