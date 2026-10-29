@@ -1,5 +1,4 @@
 
-import dotenv from 'dotenv';
 import { PrismaClient } from "../../generated/prisma/client";
 import { AISummaryWhereInput } from "../../generated/prisma/models";
 import { LLMClient } from "../../ai/client";
